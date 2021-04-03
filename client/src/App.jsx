@@ -2,7 +2,9 @@ import "./style.scss";
 import "./App.css";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import socketio from "socket.io-client";
 
+const socket = socketio.connect("http://localhost:8081");
 const today = new Date();
 const week = [
   "일요일",
@@ -27,6 +29,9 @@ const App = () => {
 
   useEffect(() => {
     getTodo();
+    socket.on("destroy", () => {
+      getTodo();
+    });
   }, []);
 
   const setTodo = async (e) => {

@@ -9,6 +9,12 @@ const Todo = db.Todo;
 const http_server = require("http").createServer(app).listen(PORT);
 const noti = require("node-notifier");
 const logger = require("morgan");
+const io = require("socket.io")(http_server);
+
+//init
+io.on("connection", (socket) => {
+  socket.on("disconnect", () => {});
+});
 
 db.sequelize.authenticate().then(async () => {
   try {
@@ -43,6 +49,7 @@ setInterval(async () => {
             idx: rows[0].idx,
           },
         });
+        io.emit("destroy");
       } catch (error) {}
     } else if (Number(schedule_hour) === Number(isHour)) {
       if (Number(schedule_minute) < Number(isMinute)) {
@@ -52,6 +59,7 @@ setInterval(async () => {
               idx: rows[0].idx,
             },
           });
+          io.emit("destroy");
         } catch (error) {}
       } else {
         if (Number(Number(schedule_minute) - Number(isMinute)) === 5) {
